@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 # File path to the new data
-file_path = "./Data From ADS/Large Signal S Params/testing10.txt"
+file_path = "./Nonlinear-Microwave-Modeling/Assignment/Data From ADS/Large Signal S Params/testing13.txt"
 
 # Function to check if a row contains valid data
 def is_valid_row(row):

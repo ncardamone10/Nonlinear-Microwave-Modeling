@@ -121,11 +121,11 @@ def plot_return_loss_and_s21(file_paths, title):
     plt.show()
 
 # File paths for the different bias conditions
-file_paths_bias1 = glob.glob('./Data From ADS/S Params/ADS S Params with VDS=2V and VGS=-0.7V*.xlsx')
-file_paths_bias1.append('./Data From ADS/S Params/S Params From Datasheet VDS=2V and VGS=-0.7V.xlsx')
+file_paths_bias1 = glob.glob('./Nonlinear-Microwave-Modeling/Assignment/Data From ADS/S Params/ADS S Params with VDS=2V and VGS=-0.7V*.xlsx')
+file_paths_bias1.append('./Nonlinear-Microwave-Modeling/Assignment/Data From ADS/S Params/S Params From Datasheet VDS=2V and VGS=-0.7V.xlsx')
 
-file_paths_bias2 = glob.glob('./Data From ADS/S Params/ADS S Params with VDS=6V and VGS=-0.45V*.xlsx')
-file_paths_bias2.append('./Data From ADS/S Params/S Params From Datasheet VDS=6V and VGS=-0.45V.xlsx')
+file_paths_bias2 = glob.glob('./Nonlinear-Microwave-Modeling/Assignment/Data From ADS/S Params/ADS S Params with VDS=6V and VGS=-0.45V*.xlsx')
+file_paths_bias2.append('./Nonlinear-Microwave-Modeling/Assignment/Data From ADS/S Params/S Params From Datasheet VDS=6V and VGS=-0.45V.xlsx')
 
 # Plot for first bias condition
 plot_return_loss_and_s21(file_paths_bias1, "Return Loss and S21 for Bias Condition VDS=2V, VGS=-0.7V")

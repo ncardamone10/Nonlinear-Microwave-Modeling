@@ -945,11 +945,11 @@ def plot_s_parameters_2x2(file_paths, title):
 
 
 # File paths for the different bias conditions
-file_paths_bias1 = glob.glob('./Data From ADS/S Params/ADS S Params with VDS=2V and VGS=-0.7V*.xlsx')
-file_paths_bias1.append('./Data From ADS/S Params/S Params From Datasheet VDS=2V and VGS=-0.7V.xlsx')
+file_paths_bias1 = glob.glob('./Nonlinear-Microwave-Modeling/Assignment/Data From ADS/S Params/ADS S Params with VDS=2V and VGS=-0.7V*.xlsx')
+file_paths_bias1.append('./Nonlinear-Microwave-Modeling/Assignment/Data From ADS/S Params/S Params From Datasheet VDS=2V and VGS=-0.7V.xlsx')
 
-file_paths_bias2 = glob.glob('./Data From ADS/S Params/ADS S Params with VDS=6V and VGS=-0.45V*.xlsx')
-file_paths_bias2.append('./Data From ADS/S Params/S Params From Datasheet VDS=6V and VGS=-0.45V.xlsx')
+file_paths_bias2 = glob.glob('./Nonlinear-Microwave-Modeling/Assignment/Data From ADS/S Params/ADS S Params with VDS=6V and VGS=-0.45V*.xlsx')
+file_paths_bias2.append('./Nonlinear-Microwave-Modeling/Assignment/Data From ADS/S Params/S Params From Datasheet VDS=6V and VGS=-0.45V.xlsx')
 
 # Plot 2x2 matrix for first bias condition
 plot_s_parameters_2x2(file_paths_bias1, "S Parameters for Bias Condition VDS=2V, VGS=-0.7V")
