@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 # Load the data from the Excel file
-file_path = './Nonlinear-Microwave-Modeling/Assignment/Data From ADS/Large Signal S Params/largeSignalS21_VDS=2V_VGS=-0.7V.xlsx'
+file_path = './Nonlinear-Microwave-Modeling/Assignment/Data From ADS/Large Signal S Params/largeSignalS21_VDS=6V_VGS=-0.45V.xlsx'
 data = pd.read_excel(file_path)
 
 # Convert frequency to GHz
@@ -31,6 +31,7 @@ ax1.set_xlabel('Frequency (GHz)')
 ax1.set_ylabel('RF Power')
 ax1.set_zlabel('Magnitude of S21 (dB)')
 ax1.set_title('Magnitude of S21 (dB)')
+ax1.set_title('EPA018A Large Signal |S21|, VDS=6V and VGS=-0.45V\nMagnitude of S21 (3D Surface)')
 
 # Create a color bar for magnitude plot
 cbar1 = fig.colorbar(surf1, ax=ax1, pad=0.1, aspect=30, format='%d dB')

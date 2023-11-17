@@ -850,7 +850,7 @@ def annotate_smith_points(ax):
 
 # Function to plot the 2x2 subplot matrix for each bias condition
 def plot_s_parameters_2x2(file_paths, title):
-    fig = plt.figure(figsize=(14, 16))  # Adjusted figure size
+    fig = plt.figure(figsize=(14, 12))  # Adjusted figure size
     fig.suptitle(title)
 
     curve_colors = ['red', 'grey', 'blue', 'green']
@@ -952,10 +952,10 @@ file_paths_bias2 = glob.glob('./Nonlinear-Microwave-Modeling/Assignment/Data Fro
 file_paths_bias2.append('./Nonlinear-Microwave-Modeling/Assignment/Data From ADS/S Params/S Params From Datasheet VDS=6V and VGS=-0.45V.xlsx')
 
 # Plot 2x2 matrix for first bias condition
-plot_s_parameters_2x2(file_paths_bias1, "S Parameters for Bias Condition VDS=2V, VGS=-0.7V")
+plot_s_parameters_2x2(file_paths_bias1, "EPA018A S Parameters for Bias Condition VDS=2V, VGS=-0.7V (Gm = 37 mS)")
 
 # Plot 2x2 matrix for second bias condition
-plot_s_parameters_2x2(file_paths_bias2, "S Parameters for Bias Condition VDS=6V, VGS=-0.45V")
+plot_s_parameters_2x2(file_paths_bias2, "EPA018A S Parameters for Bias Condition VDS=6V, VGS=-0.45V (Gm = 50 mS)")
 
 
 

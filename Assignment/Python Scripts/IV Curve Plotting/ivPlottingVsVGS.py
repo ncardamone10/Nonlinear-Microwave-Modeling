@@ -35,7 +35,7 @@ for vds, color in zip(closest_vds_values, color_list):
 
 plt.xlabel('VGS (V)')
 plt.ylabel('IDS (mA)')
-plt.title('IV Curves for Selected VDS Values')
+plt.title('EPA018A IV Curves vs VGS')
 
 # Reversing the order of legend entries
 handles, labels = plt.gca().get_legend_handles_labels()

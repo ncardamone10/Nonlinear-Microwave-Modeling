@@ -35,7 +35,7 @@ for vgs, color in zip(closest_vgs_values, color_list):
 
 plt.xlabel('VDS (V)')
 plt.ylabel('IDS (mA)')
-plt.title('IV Curves for Selected VGS Values')
+plt.title('EPA018A IV Curves vs VDS')
 plt.legend(title="VGS Values", loc="best")
 plt.grid(True)
 plt.show()

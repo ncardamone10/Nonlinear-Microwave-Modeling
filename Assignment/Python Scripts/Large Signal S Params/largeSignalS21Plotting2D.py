@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Load the data from the Excel file
-excel_file_path = './Nonlinear-Microwave-Modeling/Assignment/Data From ADS/Large Signal S Params/largeSignalS21_VDS=6V_VGS=-0.45V.xlsx'
+excel_file_path = './Nonlinear-Microwave-Modeling/Assignment/Data From ADS/Large Signal S Params/largeSignalS21_VDS=2V_VGS=-0.7V.xlsx'
 data = pd.read_excel(excel_file_path)
 
 # Convert frequency to GHz
@@ -22,7 +22,7 @@ desired_power_levels = [-20, -10, -5, 0, 5, 10, 20]
 fig, axs = plt.subplots(2, 1, figsize=(10, 12))
 
 # Top subplot: Magnitude of S21 vs. Input Power
-axs[0].set_title('EPA018A Large Signal |S21|, VDS=6V and VGS=-0.45V\nMagnitude of S21 vs Input Power')
+axs[0].set_title('EPA018A Large Signal |S21|, VDS=2V and VGS=-0.7V\nMagnitude of S21 vs Input Power')
 axs[0].set_xlabel('Input Power (dB)')
 axs[0].set_ylabel('Magnitude of S21 (dB)')
 
@@ -55,6 +55,7 @@ axs[0].legend(labels, title="Input Frequencies", loc="best")
 axs[1].set_title('Magnitude of S21 vs Frequency')
 axs[1].set_xlabel('Frequency (GHz)')
 axs[1].set_ylabel('Magnitude of S21 (dB)')
+axs[1].set_title('EPA018A Large Signal |S21|, VDS=2V and VGS=-0.7V\nMagnitude of S21 (3D Surface)')
 
 # Generate colors for the curves
 color_list = plt.cm.rainbow(np.linspace(0, 1, len(desired_power_levels)))

@@ -55,6 +55,6 @@ plt.legend(handles[::-1], labels[::-1], title="VDS Values", loc="best")
 # Label the axes and add title
 plt.xlabel('VGS (V)')
 plt.ylabel('Gm (mS)')
-plt.title('Transconductance vs Gate Voltage')
+plt.title('EPA018A Transconductance vs Gate Voltage')
 plt.grid(True)
 plt.show()

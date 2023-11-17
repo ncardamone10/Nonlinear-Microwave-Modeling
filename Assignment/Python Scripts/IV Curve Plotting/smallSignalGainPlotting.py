@@ -140,20 +140,26 @@ surf = ax1.plot_surface(vds_mesh, IDS_reshaped, Av_dB_masked_reshaped, cmap='jet
 ax1.set_xlabel('VDS (V)')
 ax1.set_ylabel('IDS (mA)')
 ax1.set_zlabel('Av (dB)')
-ax1.set_title('3D Surface Plot of VDS vs IDS vs Av in dB')
+ax1.set_title('EPA018A Surface Plot of |Small Signal Gain| Vs Bais Conditions ')
 # Adding color bar to the 3D plot
 cbar = fig.colorbar(surf, ax=ax1, shrink=0.5, aspect=5)
 cbar.ax.yaxis.set_major_formatter(FuncFormatter(format_ticks))  # Format color bar ticks
+cbar.set_label('|Av|(dB)') 
 
 # 2D pcolormesh plot
 ax2 = fig.add_subplot(122)
 mesh = ax2.pcolormesh(vds_mesh, IDS_reshaped, Av_dB_masked_reshaped, cmap='jet', shading='auto')
 ax2.set_xlabel('VDS (V)')
 ax2.set_ylabel('IDS (mA)')
-ax2.set_title('2D Pcolormesh Plot of VDS vs IDS (Color: Av in dB)')
+ax2.set_title('EPA018A |Small Signal Gain| Vs Bias Conditions')
+# Make the 2D plot square
+#ax2.set_aspect('equal', 'box')
+# Add grid lines
+ax2.grid(True)  # Add grid lines
 # Adding color bar to the 2D plot
 cbar2 = fig.colorbar(mesh, ax=ax2, shrink=0.5, aspect=5)
 cbar2.ax.yaxis.set_major_formatter(FuncFormatter(format_ticks))  # Format color bar ticks
+cbar2.set_label('|Av|(dB)')
 
 # Show the plot
 plt.show()

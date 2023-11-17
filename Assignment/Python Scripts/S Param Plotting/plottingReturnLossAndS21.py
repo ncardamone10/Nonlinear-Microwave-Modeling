@@ -49,7 +49,7 @@ def calculate_reflection_coefficient(r, x):
     return gamma
 
 def plot_return_loss_and_s21(file_paths, title):
-    fig = plt.figure(figsize=(14, 16))  # Adjusted figure size
+    fig = plt.figure(figsize=(14, 12))  # Adjusted figure size
     fig.suptitle(title)
 
     curve_colors = ['red', 'grey', 'blue', 'green']
@@ -128,7 +128,7 @@ file_paths_bias2 = glob.glob('./Nonlinear-Microwave-Modeling/Assignment/Data Fro
 file_paths_bias2.append('./Nonlinear-Microwave-Modeling/Assignment/Data From ADS/S Params/S Params From Datasheet VDS=6V and VGS=-0.45V.xlsx')
 
 # Plot for first bias condition
-plot_return_loss_and_s21(file_paths_bias1, "Return Loss and S21 for Bias Condition VDS=2V, VGS=-0.7V")
+plot_return_loss_and_s21(file_paths_bias1, "EPA018A Return Loss and S21 for Bias Condition VDS=2V, VGS=-0.7V (Gm = 37 mS)")
 
 # Plot for second bias condition
-plot_return_loss_and_s21(file_paths_bias2, "Return Loss and S21 for Bias Condition VDS=6V, VGS=-0.45V")
+plot_return_loss_and_s21(file_paths_bias2, "EPA018A Return Loss and S21 for Bias Condition VDS=6V, VGS=-0.45V (Gm = 50 mS)")
