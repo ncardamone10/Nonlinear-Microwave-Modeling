@@ -55,7 +55,6 @@ axs[0].legend(labels, title="Input Frequencies", loc="best")
 axs[1].set_title('Magnitude of S21 vs Frequency')
 axs[1].set_xlabel('Frequency (GHz)')
 axs[1].set_ylabel('Magnitude of S21 (dB)')
-axs[1].set_title('EPA018A Large Signal |S21|, VDS=2V and VGS=-0.7V\nMagnitude of S21 (3D Surface)')
 
 # Generate colors for the curves
 color_list = plt.cm.rainbow(np.linspace(0, 1, len(desired_power_levels)))
