@@ -1,0 +1,359 @@
+
+ELG 3106 Design Study Report
+
+
+
+
+Comparing Design Approaches Associated with Anti-Reflection Coatings on Solar Panels
+
+
+
+
+
+
+
+
+
+Submitted by
+Nick Cardamone, 300060019
+
+Dec 18, 2020
+University of Ottawa
+  
+Abstract
+As the world moves to a greener economy, solar power production will be at the forefront of that shift. This design study looks at the impacts of design parameters on a single generic solar cell's power output. This study focuses on designing a multilayer anti-reflection coating to improve the performance of the solar cell. The choices of layer thicknesses and refractive indices are calculated for two- and three-layer systems. Those calculation processes are then compared to find the optimal design method for finding the optimal choices of design parameters. Those choices are then contrasted with the real-world constraints of getting a solar, photovoltaic cell mass manufactured for use in the evolving energy infrastructure.  
+Table of Contents
+Abstract	i
+Table of Contents	ii
+List of Figures	iv
+List of Tables	vi
+1	Introduction	7
+2	Background Theory	8
+2.1	Solar Panel Construction	8
+2.2	Spectral Power and Intensity	9
+2.3	Normal Incidence Reflections and Transmissions	10
+2.4	The Transfer Matrix Method	11
+2.5	Two Layer Case	13
+2.6	Three Layer Case	14
+3	Solar Cell with Single Layer Coating	15
+4	Solar Cell with Double Layer Coating	16
+4.1	TMM Code Explanation	16
+4.2	Double Layer System Response	19
+4.3	Optimizing Refractive Index from Pmax	20
+4.4	Improving the Power Transfer	22
+5	Solar Cell with Triple Layer Coating	23
+5.1	Triple Layer System Response	23
+5.2	Optimizing Refractive Index from Pmax	24
+5.3	Improving the Power Transfer	26
+6	Design Considerations	27
+6.1	Approximations and Idealizations	27
+6.2	Bandwidth vs Number of Layers vs Cost	27
+6.3	Refractive Indices vs Material Strength	28
+6.4	Optimization Approaches	28
+7	Conclusions	30
+8	References	31
+APPENDIX I:  MATLAB CODE	32
+APPENDIX II:  Paper Math Calculations	33
+APPENDIX III:  Provided Math Calculations	35
+ 
+List of Figures
+
+
+Figure 1: An Array of Solar Panels on a Roof	7
+Figure 2: Solar Cell Diagram [2]	8
+Figure 3: Ideal Solar Radiation from Black Body	9
+Figure 4: Reflection and Transmission at a Single Interface	10
+Figure 5: Diagram of Multilayer Propagation of an Electric Field	11
+Figure 6: Two Layer Stack	13
+Figure 7: Triple Layer Stack	14
+Figure 8: Single Layer Response, n = 1.4	15
+Figure 9: Double Layer Response, n2 = 2.62	19
+Figure 10: 3D Plot, n2 vs λ vs R and T, 2 Layer Stack	19
+Figure 11: Power vs Refractive Index, Integrating from 400 to 1400 nm, 2 Layer Stack	20
+Figure 12: Double Layer Response, n2 = 2.33	21
+Figure 13: Power vs Refractive Index, Integrating from 200 to 2200 nm, 2 Layer Stack	21
+Figure 14: Double Layer Response, n2 = 2.30	22
+Figure 15: Triple Layer Response, n2 = 2.357	23
+Figure 16:3D Plot, n2 vs λ vs R and T, 3 Layer Stack	23
+Figure 17: Power vs Refractive Index, Integrating from 400 to 1400 nm, 3 Layer Stack	24
+Figure 18: Triple Layer Response, n2 = 2.27	25
+Figure 19: Power vs Refractive Index, Integrating from 200 to 2200 nm, 3 Layer Stack	25
+Figure 20: Triple Layer Response, n2 = 2.12	26
+Figure 21: Gradient Descent in 2 Dimensions [3]	29
+
+
+
+ 
+List of Tables
+Table 1: Comparing Power Over Integration Path, 2 Layer Stack	20
+Table 2: Comparing Power Over Integration Path, 3 Layer Stack	24
+
+
+
+ 
+ 
+	Introduction
+As the world moves on from using hydrocarbons as a source of energy, we will need a new method of power production. There are several options, from wind turbines to geothermal to nuclear fission power plants. Another option is solar power, and this is the topic of this report. 
+Solar power comes from solar panels, essentially a planar chunk of specialized silicon with leads attached to the top and bottom surfaces in a special way. When solar panels are constructed in an optimal way, they can produce about 20 V at 8 A for an average nonindustrial size panel. 
+ For the panel to produce this power, the photons striking the surface of the panel must enter the silicon substrate. In this report, we will focus on the design aspects of the coating used to protect and enhance the operation of a typical solar cell. If we consider that coating to be a separate system, our goal is to make the optical filter response of that system equal to unity for as large of an optical bandwidth as possible.
+ 
+Figure 1: An Array of Solar Panels on a Roof 
+Background Theory
+Solar Panel Construction
+The heart of a solar panel is the PN junction, where P type silicon and N type silicon meet. The layers in that junction are doped in such a way that in incident photon will cause displacement of electrons. This displacement causes a current to and a voltage to form across the cell. Above that junction (and the complementary metal leads) is an anti-reflection coating. The job of the coating is to make as much of the incident light on the solar panel reach the PN junction as possible. That anti-reflection coating consists of several layers of substances such as silicon nitride or titanium oxide [1]. The parameters to be controlled for each layer are the refractive index (nm) and the thickness of each layer (dm). Below is a simplified diagram of a solar cell.
+ 
+Figure 2: Solar Cell Diagram [2]
+Spectral Power and Intensity
+For the analysis later, we will need to define some physical and mathematical concepts. The first of which is electromagnetic radiation intensity of an ideal source, otherwise known as blackbody radiation. The formula for intensity (I, in watts per cubic meter) as a function of wavelength (λ, in nanometers) is as follows
+I(λ)=6.16E15/(λ^5 (exp⁡(2484/λ)-1))
+ 
+Figure 3: Ideal Solar Radiation from Black Body
+If we want to find the optical power (in watts per square meter) that is absorbed into the Si cell, we take a line integral of the above equation with respect to wavelength.
+P= ∫_(λ_1)^(λ_2)▒T(λ)I(λ)dλ
+Where T(λ) is the transmissivity or transfer function of our anti-reflection coating system as a function of wavelength. If we take T equal to one, the maximum power density we can achieve is about a kilowatt per square meter of solar panel.
+Normal Incidence Reflections and Transmissions
+In order to significantly simplify this report, normal incidence of the electric field will be the only field component that will be considered. Below is a diagram of reflection and transmission at a single interface.
+ 
+Figure 4: Reflection and Transmission at a Single Interface
+Moving forward, there are two important quantities to define, the reflection coefficient (Γm-1,m) and the transmission coefficient (τm-1,m) moving from medium m-1 to medium m.
+Γ_(m-1,m)=  (n_(m-1,m)-n_m)/(n_(m-1,m)+n_m )
+τ_(m-1,m)=  (2n_(m-1,m))/(n_(m-1,m)+n_m )
+Where n is the refractive index of the relevant layer.
+The Transfer Matrix Method
+Once we stack two or layers of material on top of one another, the electric field will be transmitted and reflected at each interface multiple times, leaving a mess of forward and backward propagating fields to sum up. This solution to this problem is to employ the transfer matrix, similar to a transfer function in circuit design. The transfer matrix takes a vector of forward and backward propagating electric fields in the initial layer and converts them to their representation in the final layer. Used in this case, the transfer matrix is really a tensor.
+ 
+Figure 5: Diagram of Multilayer Propagation of an Electric Field
+ 
+To calculate the transfer matrix, we use the following.
+ 
+Where P is called the propagator matrix and Q is the dynamical matrix. The matrix Q allows us to transform from one layer to the next adjacent layer. The matrix P allows us to propagate through a single layer. In order to propagate though any number of stacked layers, we simply multiply the corresponding propagation and dynamical matrices. P and Q are defined as follows
+ 
+ 
+Where δm is the accumulated phase of the electric field while propagating through the layer m. δ is defined as follows
+δ_m=(2πn_m d_m)/λ
+Where λ is the free-space wavelength. If we consider the stack of layers to be a single system, we can define an overall reflection and transmission coefficient as follows
+ 	 
+We can then define an overall reflectivity and transmissivity for the entire system as follows
+ 
+
+Where nN+1 / n0 is equal to the refractive index of silicon (3.5). The goal of this study is to find the system parameters to minimize R and maximize T over as wide of an optical bandwidth as possible, thus maximizing power.
+Two Layer Case
+For a two-layer stack, we have four design parameters to change. However, one of those layers needs to be some type of glass derivative. So that leaves us with three parameters to play with, n2, d1, and d2. When the math is done, it works out that the optimal choice for the thicknesses is one-quarter of the center wavelength in the corresponding material. That leaves only the refractive index of the second layer to find. To do that, R∶=0→T_21=0
+When the math is done, the formula for the optimal refractive index of layer two is
+n_2=√((n_1^2 n_3)/n_0 )=1.4√3.5=2.62
+ 
+Figure 6: Two Layer Stack
+
+Three Layer Case
+For the triple layer stack three different refractive indices and three thicknesses to change, but, similar to the previous case, one of those refractive indices is set by the choice of the top glass coating. We then do the same thing as before by setting the thicknesses to a quarter of the medium wavelength. We are then left with two design parameters. When the math is done, we get the following relation
+n_2=  (n_1 n_3)/√(n_0 n_4 )=  (1.4*3.15)/√(1*3.5)=2.36
+
+ 
+Figure 7: Triple Layer Stack
+
+Solar Cell with Single Layer Coating
+When a single, glass layer is used without an anti-reflective coating this is the system reflectivity as a function of wavelength.
+ 
+Figure 8: Single Layer Response, n = 1.4
+With only the single layer of glass, we get a power density of about 1.09 watts per square meter at with a span of 1 nm about the center wavelength. If we were to instead eliminate this layer all together and have bare silicon, the power density figure drops to a measly 523 milliwatts per square meter, 44% of the total power density available at that 1 nm bin. We will see as the number of layers increase, the performance of the overall system does as well. 
+Solar Cell with Double Layer Coating
+TMM Code Explanation
+To implement the TMM approach, I went with the general principle of define every equation as its own separate function in a separate file. For example, to get delta, I used the following
+function delta = getDelta(lambda, n_m, d_m)
+    delta = 2*pi*n_m.*d_m./lambda;
+end
+
+For the matrices, P and Q, I chose to return them as multi dimensional cell arrays. One dimension holds P for a single layer over all wavelength, while the other holds P for for each individual layer.
+function P = getP(layerDelta)
+    P = {};
+    for count = 1:length(layerDelta)
+        P{end+1} = [exp(1j*layerDelta(count)) 0; 0 exp(-1j*layerDelta(count))];    
+    end 
+end
+
+function Q = getQ(interfaceTau, interfaceGamma, N)
+    Q = {};
+    for count = 1:N
+        Q{end + 1} = [1 interfaceGamma; interfaceGamma 1];
+        Q{end} = (1/interfaceTau)*Q{end};
+    end
+end
+
+When getting P layerDelta is a vector that holds delta for a single layer, but over all frequency. When getting Q, both gamma and tau are scalar quantities associated with a single interface.
+To get the transfer matrix, I used a combination of defining it in a separate file and generating it in the main file. The function call is defined as follows
+function cellT = getSystemTransferMatrix(cellArrayOfP, cellArrayOfQ, numberOfLayers, numberOfPoints)
+    %To do: create T matrix for every wavelength value/ point in time
+    %cellArrayOfP{layerNumber}{wavelength}
+    %cellArrayOfQ{interfaceNumber}{wavelength}
+    cellT = {};
+    for count = 1:numberOfPoints 
+        %T for a single wavelength, across all layers, return T as matrix
+        T = cellArrayOfQ{1}{count};
+        for k = 2:(numberOfLayers + 1)
+            T = T*cellArrayOfP{k-1}{count};
+            T = T*cellArrayOfQ{k}{count};
+        end
+        %Put T in cell
+        cellT{end + 1} = T;
+    end
+end
+
+When the function call is completed, a cell array is returned. One dimension holds the transfer matrix for all wavelength, the other two hold the two dimensions of the matrix itself. The main function is defined as follows
+%Finding power for double layer
+clear all
+
+lambdaMax = 1400;
+lambdaMin = 200;
+numberOfPoints = 100;
+centerWavelength = 650;
+numberOfLayers = 2;
+lambda = linspace(lambdaMin, lambdaMax, numberOfPoints);
+N = numberOfLayers + 2;
+n = [1, 1.4, 2.62, 3.5];
+d = centerWavelength*0.25./n;%*ones([1 N]);
+
+arrayOfP = {};
+arrayOfQ = {};
+
+
+
+%This creates a 4D array of P matrices
+%x and y directions are the regular 2x2 matrix for a single layer (P)
+%z direction is for the single layer P matrix for every wavelength
+%the 4th dimension is for the multiple layer (for 2 layers, this dimension
+%is 2
+for count = 1:numberOfLayers
+    layerDelta = getDelta(lambda, n(count+1), d(count+1)); 
+    %return array of delta for all wavelengths, for a single layer
+    
+    arrayOfP{end + 1} = getP(layerDelta);
+    %return P for a single layer, but for all wavelength
+    %stick it into list of all P for each layer
+end
+
+
+for count = 2:N
+    interfaceTau = getInterfaceTau(n(count - 1), n(count));
+    interfaceGamma = getInterfaceGamma(n(count - 1), n(count));
+    arrayOfQ{end + 1} = getQ(interfaceTau, interfaceGamma, numberOfPoints);
+end
+
+
+systemTransferMatrix = getSystemTransferMatrix(arrayOfP, arrayOfQ, numberOfLayers, numberOfPoints);
+%celldisp(systemTransferMatrix);
+systemTau = getSystemTau(systemTransferMatrix, numberOfPoints);
+systemGamma = getSystemGamma(systemTransferMatrix, numberOfPoints);
+T = getSystemTransmissivity(systemTau);
+R = getSystemReflectivity(systemGamma);
+
+Check = R + T;
+if Check ~= 1
+    disp("ERROR")
+end
+
+I =  6.16E15./(lambda.^5.*(exp(2484./lambda)-1));
+TI = T.*I;
+
+P = trapz(lambda, TI)
+P = simpsons(TI, lambdaMin, lambdaMax, numberOfPoints)
+
+Double Layer System Response
+ 
+Figure 9: Double Layer Response, n2 = 2.62
+ 
+Figure 10: 3D Plot, n2 vs λ vs R and T, 2 Layer Stack
+
+Based on this analysis, the optimal choice for n2 is 2.62. However, there is more to this below.
+Optimizing Refractive Index from Pmax 
+Table 1: Comparing Power Over Integration Path, 2 Layer Stack
+Integration Lower Bound (nm)	Integration Upper Bound (nm)	Max Power (W/m¬²)	Refractive Index
+400	1400	708	2.33
+200	2200	905	2.30
+
+ 
+Figure 11: Power vs Refractive Index, Integrating from 400 to 1400 nm, 2 Layer Stack
+ 
+Figure 12: Double Layer Response, n2 = 2.33
+ 
+Figure 13: Power vs Refractive Index, Integrating from 200 to 2200 nm, 2 Layer Stack
+ 
+Figure 14: Double Layer Response, n2 = 2.30
+Improving the Power Transfer
+Yes, it is possible to increase the power transfer (by optimizing for it instead of minimizing R). However, in this analysis, we are not taking into consideration the optical response of the silicon itself. We are also assuming that all the materials are lossless. When those factors are taken into consideration, there will be more design parameters to take into consideration. To find the optimal value of these parameters, my suggestion is to borrow techniques from machine learning—more on that below.
+
+
+Solar Cell with Triple Layer Coating
+Triple Layer System Response
+ 
+Figure 15: Triple Layer Response, n2 = 2.357
+ 
+Figure 16:3D Plot, n2 vs λ vs R and T, 3 Layer Stack
+Based on this analysis, the optimal choice for n2 is 2.357. However, there is more to this below.
+Optimizing Refractive Index from Pmax 
+Table 2: Comparing Power Over Integration Path, 3 Layer Stack
+Integration Lower Bound (nm)	Integration Upper Bound (nm)	Max Power (W/m¬²)	Refractive Index
+400	1400	727	2.27
+200	2200	926	2.12
+
+ 
+Figure 17: Power vs Refractive Index, Integrating from 400 to 1400 nm, 3 Layer Stack
+ 
+Figure 18: Triple Layer Response, n2 = 2.27
+ 
+Figure 19: Power vs Refractive Index, Integrating from 200 to 2200 nm, 3 Layer Stack
+ 
+Figure 20: Triple Layer Response, n2 = 2.12
+Improving the Power Transfer
+The refractive indices obtained from maximizing the power are not consistent with the analytical approach. This is because the analytical approach is to make R = 0 for the center wavelength only, whereas the maximizing the power approach does what the name suggests. Comparing figures 15, 18 and 20, it is clear that optimizing for power density is the way to go. There is also a trade-off between linearity of the response, optical bandwidth and power transfer. If this was a system in which data was being transferred (say in an optical link), the linearity of the response would matter. But in this case, all we care is about is power transfer because solar cells are part of the power electronics field. 
+
+Design Considerations  
+I should probably preface this section with the knowledge that I worked for a photovoltaic system installation company for my coop work term this past summer. Some of the design considerations will go beyond the scope of choosing refractive indices and thicknesses to maximize power transfer.
+Approximations and Idealizations
+Comparing the simulated TMM results with the analytical results, it is clear there are better ways to choose design parameters than basing everything off of a single center wavelength. There is also a side to designing the solution to this problem that the simulations did not capture: the approximations and idealizations. We assumed that the layers were lossless, and that might not be true. We also assumed the Si can convert a photon to electron with 100% efficiency. We also assumed that we can make an anti-reflective coating whose parameters can be adjusted continuously. We did not take into account the effect of manufacturing tolerances on the system. And the list goes on. If we truly want to produce an optimal solution, we need to use a more sophisticated design approach and simulation method. However, taking such approach trades off the time required to design the system.
+Bandwidth vs Number of Layers vs Cost
+Comparing the number of layers to the optical bandwidth of the system, there is a correlation between the number of layers and an increase in the effective passband. However, as the number of layers increases, the linearity of the passband degrades. In addition to that, more layers increase the cost of manufacturing the panels. And this makes sense: a better solution will cost more. But, increasing the cost will decrease the prevalence of purchase of the photovoltaic cells. From the motivating example, it is clear that we need as much solar energy as possible to support the evolving energy infrastructure. So, there must be a trade-off made between cost (number of layers) and efficiency of the system. If we are really going to mass manufacture solar cells, we need a better method of manufacturing the anti-reflective coating.
+Refractive Indices vs Material Strength
+Another important consideration when designing a photovoltaic system is mechanical strength, hardness, and general resistance to being shattered. The solar panels that are currently being manufactured today are very brittle and smash very easily. In particular, the first layer of glass smashes in a large circular pattern around the point of impact. When this happens, the power output of the panel is reduced. For solar panels going forward, the strength of this first glass layer is critical. Choosing a stronger material to make the outer layer out of places further constraints on the rest of the thicknesses and refractive indices of the other layers.
+Optimization Approaches 
+
+Throughout this design exploration, the various methods only converge to the local extrema of the system function. To get to global extremum, a more sophisticated approach is needed. As it turns out, this problem is very similar to training a neural network.  A neural network, or artificial intelligence, is nothing more than a very complicated function that takes an input, whether that be an image, sound file or data set, and produces a meaningful output. To train a neural network, one needs to adjust the weights and biases of that network, which are very similar to the design parameters here. There are several methods for finding the optimal values of weights and biases in artificial intelligence. My suggestion for tackling this problem involves using the gradient descent algorithm along with randomness.
+To optimize this solar cell design problem, consider the system function and its gradient. The design parameters should be adjusted in accordance with taking a step in the direction of that gradient vector. Once that is done, the system will be at a local extremum. 
+The initial design parameters are initialized to acceptable random values. If the optimization is run multiple times, the local extremum can be recorded, and the global extremum can be extracted. Below is a visual to represent gradient descent in 2 dimensions. 
+ 
+Figure 21: Gradient Descent in 2 Dimensions [3]
+ 
+Conclusions
+
+In conclusion, when designing the anti-reflection coating, it is optimal to choose a more sophisticated design approach, then the employed analytical method. To get proper design parameters, one must use the transfer matrix method while taking real-world considerations into account, such as cost, durability, and fabrication tolerances. Once that is done, an optimal design solution will present itself to be mass-manufactured as part of the global energy revolution.
+ 
+
+References
+
+[1] 	SinoVoltaics, 2020. [Online]. Available: https://sinovoltaics.com/learning-center/solar-cells/anti-reflective-coating-for-solar-panels/#:~:text=The%20Anti%20Reflective%20Coating%20on,or%20titanium%20oxide%20is%20used..
+[2] 	MatMatch, 2020. [Online]. Available: https://matmatch.com/blog/what-are-solar-panels-and-how-do-they-produce-electricity/.
+[3] 	3. B. 1. Brown, 2020. [Online]. Available: https://i.ytimg.com/vi/IHZwWFHWa-w/maxresdefault.jpg.
+
+
+
+
+
+ 
+APPENDIX I:  MATLAB CODE 
+
+  
+
+APPENDIX II:  Paper Math Calculations 
+
+ 
+
+
+
+  
+
+APPENDIX III:  Provided Math Calculations
+
+
+  
+
+ 
+Where I worked this past summer, if you’re curious. Thanks for marking this the week before Christmas. It means a lot to us students.

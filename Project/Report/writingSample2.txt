@@ -1,0 +1,105 @@
+
+ 
+Introduction
+In this lab, we will focus on the differential amplifier or diff pair. In particular, the diff pair will be examined in terms of its bias conditions, its response to a single-ended input, and its common-mode rejection ratio. 
+A diff pair is a pair of symmetric transistors with their emitters shorted to a single current source. In this lab, a BJT current sink is used to replace the ideal current source.
+Throughout this lab, it is worth noting that I have changed the circuit quite a bit. The first change is to use a CA3086 NPN transistor array IC for all transistors. This will ensure all transistors are perfectly matched. The second change has to do with the biasing network for the diff pair. The original biasing through a 2 MΩ resistor caused problems due to the 1 MΩ input impedance of my scope. To fix this, I dropped the bias resistors to 10 kΩ and drove them from a separate bias supply.
+Components and Equipment Used
+Table 1: Components Used
+2.2 kΩ resistor x2	10 kΩ resistor x2	10 μF capacitor x2	2 MΩ resistor
+6.8 kΩ resistor	CA8036 NPN Transistor Array IC	Decade Resistance Substitution Box	Multimeter
+Rigol Function Gen	Rigol Benchtop PSU	Rigol Oscilloscope	Analog Discovery 2
+Circuit Diagram
+ 
+Figure 1: Lab Circuit 
+
+Pre-Lab
+ 
+Figure 2: Prelab Current Mirror Calculation
+Simulation Results
+  
+                         Figure 3: Simulation Circuit                                                              Figure 4: Simulation Plot
+ 
+Figure 5: Diff Pair Simulation
+Experimental Results
+Part One
+Since all transistors are on the same die, they all have the same values for beta. The datasheet for the IC gives a typical beta value of 100 for 1 mA of collector current and a collector to emitter voltage of 3 V.
+Part Two
+The circuit used in this section can be found in figure one, with the input left open.
+Table 2: Circuit DC Operating Point Measurements
+Label	Value	Label	Value
+VC1	8.519V	VC3	-5.963V
+VB1	-5.250V	VB3	-9.240V
+VC2	8.542V	IC3	1.357mA
+VB2	-5.250		
+
+I_REF=9.24/6.8k=1.36mA 					       [1]
+Table 3: Voltage at Distortion Measurements (linear range of output)
+Label	Value
+Vs	143mVpp
+Vin	90.4mVpp
+Vout	2.94Vpp
+
+ 
+Figure 6: Determining Linear Range of Output
+Table 4: Offset Voltage Measurements
+Label	Value
+Base to Base Offset Voltage	0V
+Collector to Collector Offset Voltage	23mV
+
+Part Three
+Table 5: Input Impedance Results
+Label	Value
+Vs	207mVpp
+Vin	22.6mVpp
+Rs	40kΩ
+Rin	9.72kΩ
+
+*note: 10 kΩ is used as the bias resistance instead of 2 MΩ 
+V_in/V_s =22.6/207=(R_in ||10kΩ)/(40kΩ+ R_in ||10kΩ) 				      [2]
+R_in=9.72kΩ
+ 
+Figure 7: Calculating the Input Impedance
+Part Four
+Table 6: Gain Measurements
+Label	Value	Label	Value
+Vs	-23.2dBV	Ad	34.5dB
+Vin	-43.9dBV	Ads	13.8dB
+Vout	-9.45dBV	Ad (expected)	34.1dB
+
+*note: expected voltage gain is found through a multisim simulation, measurement method two is used to generate the numbers in table six (see below)
+
+
+
+Part Five
+The following circuit is used for this section
+ 
+Figure 8: Part Five Circuit
+Table 7: Common Mode Measurements - Measurement Method #1
+Label	Value	Label	Value
+Vs	5Vpp	Θ	45°
+Vin	552mVpp	Vout	6.8mVpp
+Vout1	8.26mVpp	ACM	0.0123V/V
+Vout2	7.90mVpp	CMMR	66dB
+
+Table 8: Common Mode Measurements - Measurement Method #2
+Label	Value	Label	Value
+Vs	-23.3dBV	Ad	34.9dB
+Vin	-42.4dBV	ACM	-36.6dB
+Vout	-79dBV	CMMR	71.5dB
+
+CMMR=A_d-A_CM 					    [3]
+ 
+Figure 9: Measuring CMMR - Measurement Method #1
+ 
+Figure 10: Measuring CMMR - Measurement Method #2 - FFT
+ 
+Figure 11: Measuring CMMR - Measurement Method #2
+Discussion
+In contrast to the lab manual, I decided to use a transistor array IC for this lab. This was done because all the transistors in the IC would have identical parameters, and thus I would avoid mismatch problems in the lab. When I was building up the circuit on the breadboard, I encountered a problem, my multimeter and scope were loading the diff pair transistors' bases. This is because the 10 MΩ and 1Ω input impedance of the measurement instruments forms a comparable voltage divider with the 2 MΩ bias resistor. To solve this, I explored a number of different biasing techniques. In the end, I decided to drop the bias resistor to 10 kΩ and drive it from a separate voltage source. I chose a voltage of 5.18 V based on the base measurement of the circuit loaded with my multimeter. I wanted a base voltage of -5.25 V, and I varied my power supply until I got that. Then I went around and verified all of the bias voltages and currents were correct and matched. If I were to do this again, I might choose a bias resistor of 100 kΩ to improve the input impedance, as the 9.7 kΩ I got is significantly less than the 50 kΩ the TAs got when they did the experiment.
+When I went to measure the linearity, I originally made an assumption that the negative side of the diff pair would not distort due to not applying a signal to the base of Q2. This turned out to be incorrect. When no signal is applied to the base of Q2, the emitter node does not act as a virtual ground. This makes Q2 act as a common base stage, with a smaller linear range than Q1. By not applying a differential signal to the diff pair, the overall linearity is degraded.
+As I was moving through the lab, I noticed that my benchtop scope was having difficulties triggering off and measuring the small input signals, particularly when I was measuring gain and CMMR. To solve this, I moved to the USB scope I got for a coop term this past summer. This scope has three advantages: a 14 bit ADC, differential input channels, and the ability to perform reasonable fidelity FFTs.
+This brings me to the two measurement methods used in this lab. Method one uses the benchtop scope to do time-domain measurements, similar to what the TAs did when they did the experiment. Method two is to use the Analog Discovery 2 to do frequency domain measurements via an FFT. The benefits of this are accuracy and noise rejection. The problem with time-domain measurements I was making was the noise coupled into the input channels. Some of the signals are so small they become comparable to the noise. With a frequency domain approach, most of the noise can be filtered out by reducing the span. The 14 bit A/D converter also makes the measurements more accurate than the 8 bit A/D of my benchtop scope.
+Using method two, the differential gain I measured (34.5 dB) is almost exactly the same as what the circuit's simulation predicted (34.1 dB). This gives a lot of confidence in method two and that all the transistors are matched for this lab. As for the CMMR, having matched transistors greatly improved it. For the TA's experiment, they got a CMMR of about 38 dB. I got a CMMR of about 70 dB. This is a massive improvement. So how do I know I am correct? Well, if you look at an LM741 op-amp, the CMMR in the datasheet has a typical value of 90 dB. Considering the collector resistors are not exactly the same, 70 dB seems reasonable to me.
+Conclusion
+In conclusion, the circuit with matched transistors acted very similarly to an ideal diff pair, which is seen throughout the measurements in parts two to five.
