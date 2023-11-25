@@ -1,0 +1,87 @@
+
+ 
+Introduction
+In many systems, we employ feedback to improve some metrics while sacrificing others. In this lab, we will look at Shunt-Shunt (Voltage Current) Feedback and apply it to a common emitter amplifier. In particular, we will look at the change in gain, bandwidth, input and output impedances. The breadboard circuits are below.
+  
+             Figure 1: Breadboard Circuit Measurement Method 1           Figure 2: Breadboard Circuit Measurement Method 2         
+Components and Equipment Used
+Table 1: Components Used
+3.3 kΩ resistor x3	1 kΩ resistor 	22 kΩ resistor	3 kΩ resistor
+330 kΩ resistor x2	220 Ω resistor x2	10 μF capacitor x3	DS 1054Z Scope
+Rigol Function Gen	PN2222A NPN Transistor	Rigol Benchtop PSU	Analog Discovery 2
+Circuit Diagram
+ 
+Figure 3: Lab 4 Circuit
+
+Pre-Lab
+    
+Figure 4: Prelab
+
+Simulation Results
+  
+                             Figure 5: Simulated Circuit 				Figure 6: Simulated Bode Plot
+Table 2: Simulated Poles
+Label	Value
+ωp,lower	700 Hz
+ωp, upper	26 MHz
+
+Experimental Results
+ 
+Figure 7: Analog Discovery Screenshot
+
+ 
+Figure 8: Lab 4 Frequency Response -- Angular Frequency
+ 
+Figure 9: Lab 4 Frequency Response
+ 
+Figure 10: Rigol Scope Screenshot
+Table 3: Measured Circuit Impedance Data
+Label	Value
+β	207
+Vs	24 mVpk
+Vb	12 mVpk
+Θ	12.06°
+Zin,b	2.90 – j1.27 kΩ
+f	5 kHz
+Rin,b	2.9 kΩ
+Cin,b	25 nF
+
+Table 4: Circuit Impedance Data
+Label	Value
+Zin,closed (measured)	1.61 – j0.345 kΩ
+C¬in,closed (measured)	92 nF
+Rin,closed (prelab)	1.4 kΩ
+
+
+
+Table 5: Circuit Transfer Function Data @ Midband Frequencies
+Label	Value
+Av (measured)	44.9 V/V
+Z0 (measured)	148 V/mA
+Z0, closed (prelab)	159 V/mA
+
+Table 6: Circuit Bandwidth Data
+Label	Value
+ωp, upper	87 kHz
+ωp, lower	8030 Hz
+ωp, lower (prelab)	134 Hz
+ωp0 (prelab)	DC x2
+
+Discussion
+I/O Impedances
+The input impedance that was measured (1.61k) is relatively close to the value that was calculated (1.4k). The errors are coming from the tolerances of the resistors, uncertainty in the intrinsic values of the transistor, and the approximations made in the prelab. The input capacitances are about what they should be. The measured input capacitance (92n) is lower than the physical 10u caps used. This is because the transistor amplifies the effect of the emitter cap, and they add in series, thus lowering the input capacitance.
+Transimpedance Gain
+The transfer characteristics were also very close to what the prelab predicted. The errors come from uncertainties in the values of the components used and approximations in the prelab.
+Bandwidth
+The bandwidth did significantly diverge from what the prelab predicted and varied a little from the simulated circuit. There are three main differences.
+The first is the initial slope of the magnitude response is not 40 dB/dec, like the prelab suggested. This can be explained by either I did not measure down to DC and there could be a zero between DC and 10 Hz, the values of the capacitances were not measured accurately, the internal capacitances of the transistor were not taken into account, or I made a mistake in the prelab.
+The second difference is the lower pole frequency. The lab measurements and simulation are pretty close, but they both vary a lot from the prelab. This leads me to believe I made a calculation mistake in the prelab.
+The third difference is in the upper pole frequency. This is not reflected in the prelab (I did not consider the internal capacitances). However, the 87 kHz is an order out from the 200 kHz that the TAs measured. I did confirm my measurement using two different methods (triple checked), so I know that what I measured is correct. The difference could be coming from different values chosen for the resistors, uncertainty in the chosen values or a measurement error on either side. Either the TA’s value or mine is still significantly different from the simulated 25 MHz. Either multisim does not have the correct device parameters set, or there is a mistake with the simulation.
+Measurement Techniques 
+Just like the other three labs, I again used two different techniques for gathering data. Method one uses an analog discovery to do frequency-domain measurements. That data is exported to MATLAB, where the frequency response is plotted. The MATLAB code is the same as lab three, and I am not including it here. The second measurement method is to use a regular benchtop scope to do time-domain measurements. 
+Conclusion
+In conclusion, the trans-impedance gain and input impedances agree with the prelab, but the bandwidth does not. This could be coming from component tolerances, prelab approximations or just general laziness in calculations.
+Thank you for reading.
+
+Appendix I: Raw Data CSV File
+ 

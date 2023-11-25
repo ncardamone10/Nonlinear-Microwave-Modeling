@@ -1,0 +1,867 @@
+ 
+LAB FOUR: MATCHED FILTERS AND BIT ERROR RATE
+[ELG 4179]
+ 
+ 
+Abstract 
+In this lab, a matched filter was simulated in order to remove noise from a received signal in order to determine the transmitted bit. The optimal receiver was then simulated in order to determine the bit error rates of different modulation schemes including BPSK, OOK, and M-QAM.
+The code presented in this report is the majority of the written code. For the complete code see
+https://github.com/ncardamone10/ELG4179
+
+Introduction
+A matched filter is a device used in receivers which decreases the bandwidth of the received signal noise to match that of the transmitted signal, decreasing the received noise power. From here there is now a signal with noise only in the frequency band of the signal, so the noise power is less, but still must be further filtered in order to detect the correct bit with high probability. An integrate and dump circuit is used to find the average value over the period of one bit, and the output is selected at the very last point of the integration, that is, at an integer multiple of the bit rate. From here, the average value of the bit’s time interval has been obtained, and a decision is made as to what bit was transmitted.
+Many different modulation schemes are used in wireless communications. BPSK uses a positive or negative voltage to send Binary 1s and 0s. OOK is similar, but only sends a positive voltage for a binary 1, and 0V for a binary 0. M-QAM utilizes a phase shift in order to send signals with amplitudes on axes orthogonal to each other. 4-QAM is a special case as it is similar to BPSK, but with a second BPSK signal sent 90° out of phase. Decoding 4-QAM is thus similar to BPSK, except the decision threshold is now at 0V on each of the 2 axes. For higher order QAM such as 16 QAM, a more sophisticated decision algorithm must be used which calculates the distance to each point, and determines from the shortest distance which bit it is most likely to be.
+Prelab
+ 
+Part A
+Part 1
+ 
+Figure 1: Ideal Transmitted Bit Stream
+Part 2
+ 
+Figure 2: Noisy Transmitted bit stream
+Part 3 
+ 
+Figure 3: Noisy transmitted bit stream and the match filtered output
+
+Part B
+Part 1
+ 
+Figure 4: Bit error rate of BPSK
+Part 2
+ 
+Figure 5: Bit error rate of OOK compared to BPSK
+Part 3
+ 
+Figure 6: Bit error rate of 4-QAM
+Part 4
+
+ 
+Figure 7: Constellation for 16-QAM
+ 
+Figure 8: Bit error rate for 16-QAM
+
+Discussion 
+Part A: Matched Filter
+Part One 
+The plot shows that the binary sequence using BPSK is ideally a train of square pulses with a positive amplitude for binary 1 and negative amplitude for binary 0. These positive and negative pulses have equal magnitude such that when decoding, the decision threshold can be set to 0 as it is equiprobable for a bit to be above or below 0V.
+Part Two
+The plot shows 3 different levels of noise added to the binary bit stream. At 0dB as noted by the blue trace, there are many points which the noisy signal crosses 0V and thus flips sign from positive to negative or negative to positive. This is not unexpected as the signal energy per bit and noise energy per bit are equal for 0dB.  As such, large spikes in both positive and negative directions can be expected for each bit. Decreasing to 3dB, the noise energy is about half that of the signal energy, and thus there are still some spikes in the signal amplitude due to the noise which cross the 0V threshold thus changing the sign with about 1 to 3 occurrences of this per bit for the given orange trace in figure 2. It should be noted that this number of occurrences where a point of the signal changed sign is only experimental data of 8 bits and due to this small sample size is not an accurate evaluation of the modulation scheme at an SNR of 3dB as a whole. This is purely to compare against the 0dB SNR, demonstrating that there is a noticeable decrease in the number of points which are the opposite sign than expected based on the no-noise signal as seen in figure 1. Halving the noise energy per bit again so that it is a quarter the signal energy at 6dB, there is only one point over the 8 bits where there is sufficient noise for the signal to cross 0V and change sign from negative to positive in the period of a bit.
+Part Three
+ Looking at the first symbol interval in figure 3, We note that the intervals look very different, but still both centered around an amplitude of approximately –1. For the unfiltered signal, over the bit interval, for each SNR there is different noise energy, but each of the signals fluctuates around an average of approximately -1. For the implementation of the matched filter set in equation (6) of the lab manual, the SNR values all start at very different values, but instead of fluctuating wildly as in the unfiltered signal, they all converge to the same point of –1 at the end of the bit interval T. This is because while the noise is random, we assume a 0 mean gaussian noise profile, and as such, over the bit interval, as more samples are taken, the average power of the noise approaches the mean of 0. Since this matched filter implementation calculates the average of all the samples between t=0 and t=T where T is the period of one bit, the noise will approach 0, leaving just the transmitted signal at point t=T, which since the transmitted bit is 0, was –1 under BPSK modulation. The ideal matched filter transfer function as shown in the lab preparation is a rectangular pulse, and thus at t=T, the rectangular pulse with an amplitude of –1 which is equal to our value of –1 which we get with the implemented match filter at the period T.
+The algorithm used calculates the average of the previous n samples where n is the number of samples per period, and so the shape of the output graph is different from that of the ideal matched filter, with it close to linearly decreasing or increasing whenever a bit changes from a 1 to a 0 or a 0 to a 1, however we only take the value at integer multiples of the bit duration T, so the graph still converges to the correct point when the sample is taken. For all 3 different SNRs, they all converge to the same point at the integer multiples of T, and they correctly indicate the signal bit.
+Part B: BER of the Optimal Receiver
+
+Part One
+For BPSK, the simulated bit error rate given a rectangular pulse shape is plotted for different SNR/Bit in figure 4. As shown in the figure, the experimental bit error rate follows the theoretical bit error rate very well, the only noticeable deviation from the theoretical trend at an SNR of 10dB. This is because at such a high SNR, there are very few errors and thus a very low probability of error. Experimentally, the deviation was not large but being the least likely point to experience an error, it is also the point with the greatest expected error. Adding even more samples could decrease this error, however the simulation would take a much longer time.
+Part Two
+Compared to BPSK, OOK has a higher bit error rate. This behaviour is expected as OOK only utilizes the positive amplitude and 0V for the binary bits 1 and 0 respectively. As such, for OOK, the difference between a binary 1 and a binary 0 is only the amplitude of the pulse, while for BPSK the difference is twice the amplitude. As such, for OOK, the distance between the decision threshold and the pulse amplitude is only half the amplitude, while for BPSK it is a full amplitude. Smaller fluctuations in noise can cross the decision threshold for OOK, and as such it has a higher bit error rate.
+Parts Three and Four
+The bit error rates calculated for 4-QAM and 16-QAM were higher than the expected values. This is likely due to either noise not being sufficiently filtered out of the system, or some issue with the decision algorithm improperly selecting which constellation point the sample is closest to.
+As shown when plotting the theoretical values for M-QAM bit error rates along with BPSK and OOK, BPSK and 4-QAM have the same bit error rate. This is because the same decision threshold is used for BPSK and 4-QAM, however there is now a second orthogonal axis in 4-QAM.
+ 
+Figure 9: Theoretical bit error rates for M-QAM
+ 
+Figure 10: 3D representation of M-QAM bit error rate, SNR/bit, and the number of constellation points which the receiver must choose between.
+16-QAM has a greater bit error rate, and the bit error continues to increase as M increases for M-QAM. This is because there are a greater number of bits with more nearest neighbours. For 4-QAM, each point on the constellation only has 2 other points equidistant form the point. These 2 points are the nearest neighbours, and have only 1 bit different from the target point. In 16-QAM, the 4 corners of the constellation have only 2 nearest neighbours, but the other exterior points have 3 nearest neighbours. Furthermore, the 4 interior points each have 4 nearest neighbours, or 4 points at equal distance from the target point. Each nearest neighbour is a potential error if the noise causes the transmitted bit to cross the threshold between the points and be closer to the other point, causing 1 bit of difference in the symbol. For the points with less than 4 nearest neighbours, there is always 1 or 2 directions in which there are no other points, and so if any point is beyond the point in one of those directions, no bit error will occur and the target bit will be selected. For points with 4 nearest neighbours, there is no direction on the constellation in which if the amplitude is too high it does not cause a bit error. Increasing M in the M-QAM modulation scheme increases the number of points on the constellation which have 4 nearest neighbours, and thus increasing the probability of bit error.
+Conclusion 
+A matched filter is useful to decrease received noise, and then find the average of that noise to then make a decision on the bit value at the end of one bit interval, that is the period of the bit. BPSK and QPSK have the same bit error rate while OOK has a worse bit error rate as does not utilize as large of a difference for the decision matrix. While higher level modulation schemes, that is M-QAM with M greater than 4, might have higher bit error rates, they are still used as they can transmit much higher data rates.
+
+Code Used
+Part A Question One
+
+% Data Params
+numberOfBits = 8;
+bits = randi([0, 1],[1, numberOfBits]);
+bitRate = 10e6;
+A = 1;
+ 
+% Sampling Params
+samplesPerBit = 100;
+Fs = bitRate*samplesPerBit;
+Ts = 1/Fs;
+L = samplesPerBit*numberOfBits;
+time = Ts*(0:L-1);
+bitTime = 1/bitRate;
+ 
+% Rect Pulse Shape
+rect = @(t, T) ...
+    (ceil(heaviside(t)) - ceil(heaviside(t - T*ones(size(t)))));
+ 
+% Generate Upsampled Bits
+zoh = ones([1 samplesPerBit]);
+bitsUpsampled = upsample(bits, samplesPerBit);
+bitsZoh = convfft(bitsUpsampled, zoh);
+bitsZoh = bitsZoh(1:L)';
+bitsZoh(bitsZoh > 0.5) = 1;
+bitsZoh(bitsZoh <= 0.5) = 0;
+ 
+x = A*(2*bitsZoh - 1);
+ 
+stem(0:length(bits)-1, bits, 'filled', 'x', 'Color', 'r', 'LineWidth', 3)
+hold on
+plot(time/bitTime, x, 'LineWidth', 2, 'Color', 'k')
+grid on
+xlabel('Bit Time (s/s)')
+ylabel('Transmitted Signal')
+title(strcat('Tx Bit Stream (', num2str(bits), ')'))
+legend('Bits', 'Bits with Zero Order Hold')
+ 
+Part A Question Two
+ 
+% Data Params
+numberOfBits = 8;
+bits = randi([0, 1],[1, numberOfBits]);
+bitRate = 10e6;
+A = 1;
+ 
+% Sampling Params
+samplesPerBit = 100;
+Fs = bitRate*samplesPerBit;
+Ts = 1/Fs;
+L = samplesPerBit*numberOfBits;
+time = Ts*(0:L-1);
+bitTime = 1/bitRate;
+ 
+% Rect Pulse Shape
+rect = @(t, T) ...
+    (ceil(heaviside(t)) - ceil(heaviside(t - T*ones(size(t)))));
+ 
+% Generate Upsampled Bits
+zoh = ones([1 samplesPerBit]);
+bitsUpsampled = upsample(bits, samplesPerBit);
+bitsZoh = convfft(bitsUpsampled, zoh);
+bitsZoh = bitsZoh(1:L)';
+bitsZoh(bitsZoh > 0.5) = 1;
+bitsZoh(bitsZoh <= 0.5) = 0;
+ 
+energyPerBit = A^2*bitTime;
+snrPerBit = [0, 3, 6];
+snrPerBit = 10.^(snrPerBit/10);
+legendText = {};
+x = zeros([length(snrPerBit), length(bitsZoh)]);
+for k = 1:length(snrPerBit)
+    N0 = energyPerBit/snrPerBit(k);
+    variance = N0*Fs/2/samplesPerBit;
+    noise = sqrt(variance)*randn(size(time));
+    x(k, :) = A*(2*bitsZoh - 1) + noise; 
+    legendText{k} = strcat('SNR = ', num2str(10*log10(snrPerBit(k))), 'dB');
+end
+  
+for k = 1:length(snrPerBit)
+    plot(time/bitTime, x(k,:), 'LineWidth', 2)  
+    hold on
+end
+stem(0:length(bits)-1, bits, 'filled', 'x', 'Color', 'c', 'LineWidth', 3)
+grid on
+xlabel('Bit Time (s/s)')
+ylabel('Transmitted Signal')
+title(strcat('Noisy Tx Bit Stream (', num2str(bits), ')'))
+legend(legendText)
+ 
+ 
+Part A Question 3
+ 
+% Data Params
+numberOfBits = 16;
+bits = randi([0, 1],[1, numberOfBits]);
+bitRate = 10e6;
+A = 1;
+ 
+% Sampling Params
+samplesPerBit = 100;
+Fs = bitRate*samplesPerBit;
+Ts = 1/Fs;
+L = samplesPerBit*numberOfBits;
+time = Ts*(0:L-1);
+bitTime = 1/bitRate;
+ 
+% Rect Pulse Shape
+rect = @(t, T) ...
+    (ceil(heaviside(t)) - ceil(heaviside(t - T*ones(size(t)))));
+ 
+% Generate Upsampled Bits
+zoh = ones([1 samplesPerBit]);
+bitsUpsampled = upsample(bits, samplesPerBit);
+bitsZoh = convfft(bitsUpsampled, zoh);
+bitsZoh = bitsZoh(1:L)';
+bitsZoh(bitsZoh > 0.5) = 1;
+bitsZoh(bitsZoh <= 0.5) = 0;
+ 
+energyPerBit = A^2*bitTime;
+snrPerBit = [0, 3, 6];
+snrPerBit = 10.^(snrPerBit/10);
+legendText = {};
+x = zeros([length(snrPerBit), length(bitsZoh)]);
+y = zeros([length(snrPerBit), length(bitsZoh)]);
+for k = 1:length(snrPerBit)
+    N0 = energyPerBit/snrPerBit(k);
+    variance = N0*Fs/2/samplesPerBit;
+    noise = sqrt(variance)*randn(size(time));
+    x(k, :) = A*(2*bitsZoh - 1) + noise; 
+    
+    y(k,:) = movmean(x(k,:), [samplesPerBit, 0]);
+    
+ 
+       legendText{k} = strcat('SNR = ', num2str(10*log10(snrPerBit(k))), 'dB');
+end
+ 
+for k = 1:length(snrPerBit)
+    subplot(2,1,1)
+    plot(time/bitTime, x(k,:), 'LineWidth', 2)  
+    hold on
+    
+    subplot(2,1,2)
+    plot(time/bitTime, y(k, :), 'LineWidth', 2)
+    hold on
+end
+subplot(2,1,1)
+stem(0:length(bits)-1, bits, 'filled', 'x', 'Color', 'c', 'LineWidth', 3)
+grid on
+xlabel('Bit Time (s/s)')
+ylabel('Transmitted Signal')
+title(strcat('Noisy Tx Bit Stream (', num2str(bits), ')'))
+legend(legendText)
+xticks(0:numberOfBits)
+ 
+subplot(2,1,2)
+grid on
+xlabel('Bit Time (s/s)')
+ylabel('Transmitted Signal')
+title(strcat('Noisy Tx Bit Stream (', num2str(bits), ')'))
+legend(legendText)
+xticks(0:numberOfBits)
+ 
+ Part B Question 1
+ 
+% Signal Params
+% Data Params
+numberOfBits = 10^6;
+bits = randi([0, 1],[1, numberOfBits]);
+bitRate = 10e6;
+A = 5;
+ 
+% Sampling Params
+samplesPerBit = 100;
+Fs = bitRate*samplesPerBit;
+Ts = 1/Fs;
+L = samplesPerBit*numberOfBits;
+time = Ts*(0:L-1);
+bitTime = 1/bitRate;
+ 
+% Rect Pulse Shape
+rect = @(t, T) ...
+    (ceil(heaviside(t)) - ceil(heaviside(t - T*ones(size(t)))));
+ 
+ 
+% Generate Upsampled Bits
+zoh = ones([1 samplesPerBit]);
+bitsUpsampled = upsample(bits, samplesPerBit);
+bitsZoh = convfft(bitsUpsampled, zoh);
+bitsZoh = bitsZoh(1:L)';
+bitsZoh(bitsZoh > 0.5) = 1;
+bitsZoh(bitsZoh <= 0.5) = 0;
+ 
+ 
+% % Create Bipolar Data with Pulse Shaping
+xBi = 2*A*bitsZoh - A;
+ 
+xBiShaped = xBi;
+ 
+singleBitEnergy = A^2*bitTime;
+ 
+snrPerBit = linspace(0,10,20);
+snrPerBit = 10.^(snrPerBit/10);
+ 
+% Generate Matched Filter Impulse Response
+h = rect(bitTime - time, bitTime);   
+ 
+berBi = zeros(size(snrPerBit));
+errorsBi = zeros(size(snrPerBit));
+snrBi = zeros(size(snrPerBit));
+ 
+for u = 1:length(snrPerBit)
+    % Generate Noise
+    variance = (A^2*samplesPerBit)/(2*snrPerBit(u));
+    noise = sqrt(variance)*randn(size(time));
+    
+    % Create Rx Sequence
+    rxSequenceBi = xBiShaped + noise;
+    
+    % Decimate Rx Signal to contain 1 sample per bit
+    mBi = zeros([1, numberOfBits]);
+    
+    for k = 1:numberOfBits
+        startIdx = (k-1)*samplesPerBit+1;
+        endIdx = k*samplesPerBit;
+        for w = startIdx:endIdx
+            mBi(k) = mBi(k) + rxSequenceBi(w);           
+        end
+    end
+    mBi = mBi/sqrt(var(mBi));
+    
+    % Threshold Decimated Rx Signal to Recover Bits
+    mBi = sign(mBi);
+    mBi = 0.5*mBi + 0.5;
+        
+    
+    % Calculate Bit Error Rate
+    bitCheckBi = xor(bits, mBi);
+    bitErrorRateBi = sum(bitCheckBi)/numberOfBits;
+        
+    
+    berBi(u) = bitErrorRateBi;
+    errorsBi(u) = sum(bitCheckBi);
+   
+    noisePowerBi = var(noise);
+    N0Bi = noisePowerBi/(Fs/2);
+    snrBi(u) = singleBitEnergy/N0Bi;
+    
+    disp(strcat('u=_', num2str(u), ' is done'))
+end
+ 
+ 
+theoBerBi = 0.5*erfc(sqrt(snrBi));
+ 
+%close all
+semilogy(10*log10(snrBi), theoBerBi)
+hold on
+ 
+scatter(10*log10(snrBi), (berBi), 'magenta')
+ 
+grid on
+ylim([1e-14, 1e0])
+xlim([0, 20])
+xlabel('SNR/ Bit (dB)')
+ylabel('Bit Error Rate')
+title('Bit Error Rate for Rect Pulse Shape')
+legend('Theo, BPSK', 'Exp, BPSK')
+ 
+ 
+Part B Question 2
+ 
+% Signal Params
+% Data Params
+numberOfBits = 10^6;
+bits = randi([0, 1],[1, numberOfBits]);
+bitRate = 10e6;
+A = 5;
+ 
+% Sampling Params
+samplesPerBit = 10;
+Fs = bitRate*samplesPerBit;
+Ts = 1/Fs;
+L = samplesPerBit*numberOfBits;
+time = Ts*(0:L-1);
+bitTime = 1/bitRate;
+ 
+% Rect Pulse Shape
+rect = @(t, T) ...
+    (ceil(heaviside(t)) - ceil(heaviside(t - T*ones(size(t)))));
+ 
+ 
+% Generate Upsampled Bits
+zoh = ones([1 samplesPerBit]);
+bitsUpsampled = upsample(bits, samplesPerBit);
+bitsZoh = convfft(bitsUpsampled, zoh);
+bitsZoh = bitsZoh(1:L)';
+bitsZoh(bitsZoh > 0.5) = 1;
+bitsZoh(bitsZoh <= 0.5) = 0;
+ 
+ 
+% % Create Bipolar and Unipolar Data with Pulse Shaping
+xBi = 2*A*bitsZoh - A;
+xUni = A*bitsZoh;
+ 
+ 
+xBiShaped = xBi;
+xUniShaped = xUni;
+ 
+singleBitEnergy = A^2*bitTime;
+ 
+snrPerBit = linspace(0,20,50);
+snrPerBit = 10.^(snrPerBit/10);
+ 
+% Generate Matched Filter Impulse Response
+h = rect(bitTime - time, bitTime);   
+ 
+berUni = zeros(size(snrPerBit));
+berBi = zeros(size(snrPerBit));
+errorsUni = zeros(size(snrPerBit));
+errorsBi = zeros(size(snrPerBit));
+snrBi = zeros(size(snrPerBit));
+snrUni = zeros(size(snrPerBit));
+for u = 1:length(snrPerBit)
+    % Generate Noise
+    variance = (A^2*samplesPerBit)/(2*snrPerBit(u));
+    noise = sqrt(variance)*randn(size(time));
+    
+    % Create Rx Sequence
+    rxSequenceBi = xBiShaped + noise;
+    rxSequenceUni = xUniShaped + noise/sqrt(2);
+    
+    % Decimate Rx Signal to contain 1 sample per bit
+    mUni = zeros([1, numberOfBits]);
+    mBi = zeros([1, numberOfBits]);
+    
+    for k = 1:numberOfBits
+        startIdx = (k-1)*samplesPerBit+1;
+        endIdx = k*samplesPerBit;
+        for w = startIdx:endIdx
+            mBi(k) = mBi(k) + rxSequenceBi(w);
+            mUni(k) = mUni(k) + rxSequenceUni(w);           
+        end
+    end
+    mBi = mBi/sqrt(var(mBi));
+    mUni = mUni/sqrt(var(mUni));
+    
+    % Threshold Decimated Rx Signal to Recover Bits
+    mBi = sign(mBi);
+    mBi = 0.5*mBi + 0.5;
+    
+    mUni = mUni - mean(mUni);
+    mUni = sign(mUni);
+    mUni = 0.5*mUni + 0.5;
+    
+     
+    % Calculate Bit Error Rate
+    bitCheckBi = xor(bits, mBi);
+    bitErrorRateBi = sum(bitCheckBi)/numberOfBits;
+    
+    bitCheckUni = xor(bits, mUni);
+    bitErrorRateUni = sum(bitCheckUni)/numberOfBits;
+    
+    berUni(u) = bitErrorRateUni;
+    berBi(u) = bitErrorRateBi;
+    errorsUni(u) = sum(bitCheckUni);
+    errorsBi(u) = sum(bitCheckBi);
+   
+    noisePowerBi = var(noise);
+    noisePowerUni = var(noise);
+    N0Bi = noisePowerBi/(Fs/2);
+    N0Uni = noisePowerUni/(Fs/2);
+    snrBi(u) = singleBitEnergy/N0Bi;
+    snrUni(u) = singleBitEnergy/N0Uni;
+    
+    disp(strcat('u=_', num2str(u), ' is done'))
+end
+ 
+theoBerBi = 0.5*erfc(sqrt(snrBi));
+theoBerUni = 0.5*erfc(sqrt(snrUni/2));
+ 
+close all
+semilogy(10*log10(snrBi), theoBerBi)
+hold on
+semilogy(10*log10(snrUni), theoBerUni)
+scatter(10*log10(snrBi), (berBi), 'magenta')
+scatter(10*log10(snrUni), (berUni), 'cyan')
+grid on
+ylim([1e-14, 1e0])
+xlim([0, 20])
+xlabel('SNR/ Bit (dB)')
+ylabel('Bit Error Rate')
+title('Bit Error Rate for Rect Pulse Shape')
+legend('Theo, BPSK', 'Theo, OOK', 'Exp, BPSK', 'Exp, OOK')
+ 
+Part B Questions 3 and 4
+% Generate I and Q Baseband Data
+numberOfBits = 10^5;
+bitsPerSymbol = 4; %Change to 2 for 4-QAM or 4 for 16-QAM
+ 
+numberOfSymbols = numberOfBits/bitsPerSymbol;
+ 
+M = 2^bitsPerSymbol;
+ 
+ 
+idxI = randi([1, bitsPerSymbol],[1, numberOfSymbols]);
+idxQ = randi([1, bitsPerSymbol],[1, numberOfSymbols]);
+ 
+numberOfLevels = bitsPerSymbol;
+levels = 1:2:numberOfLevels-1;
+levels = [-flip(levels), levels];
+numberOfLevels = length(levels);
+ 
+assert(numberOfLevels == bitsPerSymbol, 'Error: Number of Levels != Number of Bits/ Symbol')
+A = 1;
+symbolsI = zeros(size(idxI));
+symbolsQ = zeros(size(idxQ));
+for k = 1:length(idxI)
+    symbolsI(k) = A*levels(idxI(k));
+    symbolsQ(k) = A*levels(idxQ(k));
+end
+disp('Symbols Created')
+ 
+% Signal Params
+bitRate = 1;
+symbolRate = bitRate/bitsPerSymbol;
+ 
+carrierFrequency = 10;
+samplesPerCycle = 2^7; % Needs to be power of 2
+ 
+ 
+Fs = samplesPerCycle*carrierFrequency;
+Ts = 1/Fs;
+ 
+L = numberOfSymbols*samplesPerCycle;
+time = Ts*(0:L-1);
+bitTime = 1/bitRate;
+symbolTime = 1/symbolRate;
+disp('Time Vectors Created')
+ 
+% Generate Upsampled Bits
+zoh = ones([1 samplesPerCycle]);
+ 
+symbolsUpsampledI = upsample(symbolsI, samplesPerCycle);
+x_MPAM_I = convfft(symbolsUpsampledI, zoh);
+x_MPAM_I = x_MPAM_I(1:L)';
+ 
+symbolsUpsampledQ = upsample(symbolsQ, samplesPerCycle);
+x_MPAM_Q = convfft(symbolsUpsampledQ, zoh);
+x_MPAM_Q = x_MPAM_Q(1:L)';
+disp('MPAM Data Created')
+ 
+% Up Conversion LO
+LO_I = 1*cos(2*pi*carrierFrequency*time);
+LO_Q = -1*sin(2*pi*carrierFrequency*time);
+ 
+ 
+% Up Convert to RF
+x_QAM_I = LO_I.*x_MPAM_I;
+x_QAM_Q = LO_Q.*x_MPAM_Q;
+ 
+% Create the RF QAM Signal
+x_QAM = x_QAM_I + x_QAM_Q;
+ 
+% Simulate Noisy Channel
+ 
+digitalSNR = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]; %dB
+digitalSNR = 10.^(digitalSNR/10);
+ 
+ber = zeros(size(digitalSNR));
+ 
+for u = 1:length(digitalSNR)
+    variance = (A^2*samplesPerCycle)/(2*digitalSNR(u));
+    noise = sqrt(variance)*randn(size(time));
+    
+    % Recieved Signal
+    sRX = x_QAM + noise;
+    
+    % Split Data into I and Q Channels
+    s_I = sRX.*LO_I;
+    s_Q = sRX.*LO_Q;
+   
+    disp('RX Downconvert Done')
+    
+    mI = zeros([1, numberOfSymbols]);
+    mQ = zeros([1, numberOfSymbols]);
+    for k = 1:numberOfSymbols
+        startIdx = (k-1)*samplesPerCycle+1;
+        endIdx = k*samplesPerCycle;
+        for w = startIdx:endIdx
+            mI(k) = mI(k) + s_I(w);
+            mQ(k) = mQ(k) + s_Q(w);           
+        end
+    end
+    disp('RX Decimate Done')
+    
+    % Decode back into symbols
+    mI = mI/max(mI)*max(levels);
+    mQ = mQ/max(mQ)*max(levels);
+    
+    thres = movmean(levels,2);
+    thres = [-100, thres(2:end), 100];
+    
+    % Now decode based on the thresholds
+    symbolsRxI = zeros(size(symbolsI));
+    symbolsRxQ = zeros(size(symbolsQ));
+    for k = 1:numberOfLevels
+        [tempVal, tempIdx] = find(mI > thres(k) & mI < thres(k+1));
+        symbolsRxI(tempIdx) = A*levels(k);
+          
+        [tempVal, tempIdx] = find(mQ > thres(k) & mQ < thres(k+1));
+        symbolsRxQ(tempIdx) = A*levels(k);
+    end
+    disp('RX Decode Done')
+   
+    % Find Bit Error Rate
+    iErrors = symbolsRxI - symbolsI;
+    iErrors = abs(iErrors);
+    iErrors(iErrors > 0.5) = 1;
+    iErrors(iErrors <= 0.5) = 0;
+    
+    numberOfIErrors = sum(iErrors)
+    serI = numberOfIErrors/numberOfSymbols;
+    berI = serI/log2(M);
+    
+    % qErrors = symbolsRxQ(2:end) - symbolsQ(1:end-1);
+    qErrors = symbolsRxQ - symbolsQ;
+    qErrors = abs(qErrors);
+    qErrors(qErrors > 0.5) = 1;
+    qErrors(qErrors <= 0.5) = 0;
+    
+    
+    numberOfQErrors = sum(qErrors)
+    serQ = numberOfQErrors/numberOfSymbols;
+    berQ = serQ/log2(M);
+    
+    
+    numberOfErrors = 0;
+    for k = 1:numberOfSymbols
+        if symbolsRxI(k) ~= symbolsI(k) || symbolsRxQ(k) ~= symbolsQ(k)
+            numberOfErrors = numberOfErrors + 1;    
+        end
+    end
+    ser = numberOfErrors/numberOfSymbols;
+    ber(u) = ser/log2(M);
+    disp('Bit Error Rates Found')
+end
+ 
+semilogy(10*log10(digitalSNR), ber)
+title('Bit Error Rate for 16-QAM')
+xlabel('Digital SNR (E_b/N_0)')
+ylabel('Bit Error Rate')
+grid on
+
+Ideal Bit Error Rate Plotting Code (Extra)
+
+%r = Eb/N0
+r = logspace(0,4,100);
+%M = [4, 16, 64, 256, 1024, 4096];
+% M = linspace(2,4^6,1000);
+% M = round(M/2)*2;
+M = 2:2:4096;
+L = length(M);
+ 
+[r, M] = meshgrid(r,M);
+ 
+legendText = {};
+Pb = zeros(size(r));
+for k = 1:L
+    m = mean(M(k,:));
+    Pb(k,:) = getPbQAM(m, r(k,:));
+%     semilogy(10*log10(r(k,:)), Pb, 'LineWidth', 2)
+%     grid on
+%     hold on
+%     legendText{k} = strcat(int2str(M(k)), 'QAM');
+end
+ 
+% legend(legendText)
+% ylim([1e-14, 1e0])
+% ylabel('Bit Error Rate (M-QAM)')
+% xlabel('SNR/bit (E_b/N_0) (dB)')
+ 
+surf(10*log10(r), M, log10(Pb), 'EdgeColor','none', 'FaceColor','interp')
+zlabel('log_1_0(Bit Error Rate (M-QAM))')
+xlabel('SNR/bit (E_b/N_0) (dB)')
+ylabel('Number of Constellation Points')
+grid on
+yticks([4, 16, 64, 256, 1024, 4096])
+ylim([4, 4096])
+title('QAM Bit Error Rate')
+colormap("jet")
+c = colorbar();
+set(gca, 'yscale', 'log')
+zlim([-14, 0])
+% set(gca, 'ColorScale', 'log')
+caxis([-14 0])
+view(2)
+ylabel(c, 'log_1_0(BER)')
+ 
+ 
+BER_thres = 1e-3*ones(size(Pb));
+ 
+ 
+zdiff = Pb - BER_thres;
+C = contours(10*log10(r), M, zdiff, [0 0]);
+% Extract the x- and y-locations from the contour matrix C.
+xL = C(1, 2:end);
+yL = C(2, 2:end);
+% Interpolate on the first surface to find z-locations for the intersection
+% line.
+zL = interp2(10*log10(r), M, Pb, xL, yL);
+% Visualize the line.
+line(xL, yL, zL, 'Color', 'k', 'LineWidth', 3);
+ 
+ 
+ 
+% Find M, SNR when Pb = 10^-3
+% idx = find(Pb < 1e-3);
+ 
+ 
+ 
+r = logspace(0,6,1000);
+legendText = {};
+% Pb2 = zeros(size(r));
+m = [1, 2, 3, 4, 5, 6];
+m = 4.^m;
+hold off
+for k = 1:length(m)
+    Pb2 = getPbQAM(m(k), r); 
+    semilogy(10*log10(r), Pb2, 'LineWidth', 4)
+    grid on
+    hold on
+    legendText{k} = strcat(int2str(m(k)), 'QAM');
+end
+ 
+y = 0.5*erfc(sqrt(2*r)/sqrt(2));
+% Pb2 = getPbQAM(4, r);
+semilogy(10*log10(r), y, 'LineWidth', 2, 'LineStyle', "-.", 'Color', 'c')
+legendText{end + 1} = 'BPSK';
+ 
+y = 0.5*exp(-r);
+semilogy(10*log10(r), y, 'LineWidth', 2, 'LineStyle',"-.", 'Color', 'm')
+legendText{end + 1} = 'DPSK';
+ 
+legend(legendText)
+ylim([1e-14, 1e0])
+ylabel('Bit Error Rate')
+xlabel('SNR/bit (E_b/N_0) (dB)')
+yticks(10.^(-14:0))
+xticks(0:40)
+title('QAM Exact BER')
+ 
+ 
+% Adaptive Modulation Gen
+% BER_max = 1e-3;
+% SNR = linspace(0, 20, 10000);
+% SNR = 10.^(SNR/10);
+ 
+% For M-QAM, find SNR_thres(M)
+% Then SNR = SNR_thres(M) + margin
+% Want max data rate
+ 
+% QAM Data Rate
+ 
+% SNR_thres = (2.^eta - 1)./eta;
+% SNR_thres = 10*log10(SNR_thres);
+ 
+ 
+SNR = linspace(0, 20, 1000);
+Margin = 0;
+SNR_InputThres = SNR - Margin;
+SNR_InputThres = 10.^(SNR_InputThres/10);
+ 
+% M_Possible = [4, 16, 64, 256, 1024, 4096];
+% M_Possible = flip(M_Possible);
+% BER_Thres = 1e-3;
+% M = zeros(size(SNR));
+% for k = 1:length(SNR_InputThres)
+%     for v = 1:length(M_Possible)
+%         BER = getPbQAM(M_Possible(v), SNR_InputThres(k));
+%         if BER <= BER_Thres
+%             break
+%         end
+%     end
+%     
+%     M(k) = M_Possible(v);
+% end
+ 
+ 
+ 
+ 
+ 
+M = zeros(size(SNR));
+for k = 1:length(SNR)
+    if SNR(k) >= 7 && SNR(k) < 9
+        M(k) = 4;
+    elseif SNR(k) >= 9 && SNR(k) < 13
+        M(k) = 16;
+    elseif SNR(k) >= 13 && SNR(k) < 18
+        M(k) = 64;
+    elseif SNR(k) >= 18 
+        M(k) = 256;
+    end
+end
+ 
+BW = 20e6;
+eta = log2(M);
+Rb = eta*BW;
+channelCapacity = BW*log2(1 + 10.^(SNR/10));
+ 
+ 
+RbLim = min(Rb, channelCapacity);
+etaLim = RbLim/BW;
+MLim = 2.^etaLim;
+% MLim = round(MLim/4)*4;
+MLim= 4.^(floor(log(MLim)/log(4)));
+etaLim = log2(MLim);
+RbLim = etaLim*BW;
+ 
+subplot(2,1,1)
+% plot(SNR, Rb/1e6)
+hold on
+ 
+plot(SNR, RbLim/1e6, 'LineWidth', 2)
+plot(SNR, channelCapacity/1e6, 'LineWidth', 2)
+grid on
+xlabel('SNR/bit (E_b/N_0) (dB)')
+ylabel('Data Rate (Mbps)')
+legend('Adaptive Modulation Scheme', 'Max Channel Capacity')
+ 
+subplot(2,1,2)
+plot(SNR, M, 'LineWidth', 2)
+hold on
+plot(SNR, MLim, 'LineWidth', 2)
+grid on
+xlabel('SNR/bit (E_b/N_0) (dB)')
+ylabel('Number of Constellation Points')
+legend('Adaptive Modulation Scheme', 'Adaptive Modulation Scheme with Capacity Limits')
+ 
+ 
+% End goal: plot data rate vs SNR + block diagram
+% delaySpread0 = 0;
+delaySpread1 = 10e-9;
+maxBw = 1/(5*delaySpread1)
+ 
+ 
+ 
+ 
+getPbQAM(16, r)
+ 
+ 
+function Pb = getPbQAM(M, r)
+    sum = zeros(size(r));
+    for k = 1:log2(sqrt(M))
+        sum = sum + getQAMPbk(k, M, r);
+    end
+    Pb = sum/log2(sqrt(M));
+end
+ 
+ 
+ 
+ 
+function Pbk = getQAMPbk(k, M, r)
+    topBound = (1 - 2^(-k))*sqrt(M) - 1;
+    sum = zeros(size(r));
+    for n = 0:topBound
+        temp = n*2^(k-1);
+        temp = temp/sqrt(M);
+        temp = floor(temp);
+        temp = (-1)^temp;
+        
+        temp2 = n*2^(k-1);
+        temp2 = temp2/sqrt(M);
+        temp2 = temp2 + 0.5;
+        temp2 = floor(temp2);
+        temp2 = 2^(k-1) - temp2;
+        
+        temp3 = 3*log2(M)/(2*(M-1));
+        temp3 = temp3*r;
+        temp3 = sqrt(temp3);
+        temp3 = (2*n + 1)*temp3;
+        temp3 = erfc(temp3);
+        
+        sum = sum + temp*temp2*temp3;
+    end
+    Pbk = sum/sqrt(M);
+end
+ 
+ 
+ 
+
+
+ 
+ 
+ 
+
+

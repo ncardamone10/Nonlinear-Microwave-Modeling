@@ -1,0 +1,148 @@
+SEPIC Controller for a LED Desk Lamp
+
+Abstract
+In this work, a Single Ended Primary Inductor Converter or SEPIC Converter is designed to act as a constant current driver to control the LEDs in a simple desk lamp. The background and theory of operation of the converter as well as the LT8570 SEPIC converter IC is discussed. A novel design approach based on scripting, simulation and experimental testing is proposed and followed. Finally the experimental results are compared to the simulation and expectations from the datasheet. The results are that the converter works as intended and preforms the required functions. The drawbacks to this design are an undesirable frequency deviation due to the IC design as well as a sub optimal efficiency for the given light load.
+Introduction
+In modern buildings is it common for the light fixtures to make use of LED modules or “light engines”. Typically, those light engines are powered by an adjustable constant current power supply (called a driver). The parameter that is controlled in the driver is the current output to the light engine. This is done because the overall brightness or light intensity is proportional to the current flowing through a LED. In this article, a constant current driver is designed and realized by using a Single Ended Primary Inductor Converter or SEPIC converter. To design such a converter, a numerical brut force search is used to determine approximate component values. After that, the circuit is simulated in LTSPICE and a PCB is designed using Altium Designer. Finally, that PCB is assembled and tested to verify the component values and system performance. In addition to that, the LED load used by the converter is a simple desk lamp pictured below.
+ 
+
+Literature Review
+In [1]
+In [2]
+In [3]
+In [4]
+In [5]
+Converter and IC Background
+To implement this SEPIC converter, the LT8570 SEPIC converter IC from Analog Devices was selected due to the ease of simulation in LTSPICE as well as availability. This IC supports a number of DC to DC converter topologies that use a low side switching transistor. The overall topology of the SEPIC converter can be described as a 4th order cascade of a boost converter followed by a modified buck-boost converter. The theory of operation of the overall converter is split into four stages. They are as follows:
+1.	Switching FET (modeled as S1) closes which shorts out L1. This dumps energy into the magnetic field of L1 as the current of the inductor increases linearly
+2.	S1 opens, which causes the energy stored in L1 to transfer into C1 in an effort to maintain current though L1
+3.	S1 closes again. The energy stored in the electric field of C1 is dumped into L2
+4.	S1 opens again. The energy stored in L2’s magnetic field converts back to current and flows through D1 to the output capacitor and load 
+It is important to note that steps one and three occur at the same time assuming steady state. Likewise for steps two and four.
+ 
+As mentioned previously, to control the SEPIC converter, the LT8570 IC has been selected to control the duty cycle applied to the switching FET, S1, which is integrated into the IC. There are two main sections of this IC: the oscillator generation and gate driver, and the feedback loop compensator.
+The oscillator is a selectably synchronisable phase locked loop with the ability to adjust the switching frequency using the external resistor RT. In addition to that, there also exists a frequency foldback block to adjust the switching frequency to further enhance efficiency. To drive the internal MOSFET, chances are the gate driver is a simple totem pole output driver.
+ 
+To stabilize the output voltage and feedback loop, the LT8570 IC has an integrated compensator which allows for loop shaping and variable output voltage using five external components. R1 in combination with the internal R2 create the error signal to be fed back. CPL can be added to add a phase lead block into the feedback path. After the error current is amplified by the transconductance amplifier, it is then fed into the loop filter made up of the internal R0 as well as the external CF, R¬C¬ and C¬C. After that loop shaping, the signal, labeled “VC” is compared and fed to the duty cycle controller.
+ 
+Design Overview
+As mentioned previously, the design of this constant current SEPIC converter makes use of the LT8570 IC. However, this IC is meant to provide a constant voltage output, when this design requires a constant current. To overcome this, a current shunt in addition to a current sense amplifier is added to provide a error signal to feedback. The current sense amplifier is a low cost instrumentation amplifier that comes with a predefined gain. In this case, a gain of 200V/V was chosen to minimize the shunt resistance while still maintaining relative immunity to system noise introduced by measuring such a small voltage. Since the current sense amplifier that was selected has a maximum allowable voltage of 5V, a simple shunt regulator was added to provide its voltage rail. To get a variable output current, a variable resistor is placed in parallel to the feedback pin. A common mode choke was also added as a way to filter the input voltage and current.
+ 
+
+
+Target Specs
+
+Vin	12 V
+Vout	40 V
+Iout	20 mA (adjustable)
+
+Design Criteria
+1.	Output current is easily adjustable
+2.	Converter does not generate excessive heat
+3.	Small form factor
+4.	Can be powered from 12V wall wart
+Bill of Materials
+
+Designator	Part Number	Description 
+U1	LT8570EDD-1#PBF	SEPIC Converter IC
+U2	INA181A2IDBVT	Current Sense Amplifier
+D1	ES3D-E3/57T	Power Diode
+D2	plva650a	5V Zener
+L1	PCSDR127-331M-RC	330u Inductor
+L2	P0351NLT	Common Mode Choke
+L3	PCSDR127-331M-RC	330u Inductor
+R1	RC0603FR-071RL	1R 0603 Shunt Resistor
+R2	RC0603FR-0710KL	10k 0603 Resistor
+R3	RC0603FR-07100KL	100k 0603 Resistor
+R4	RC0603FR-0747KL	47k 0603 Resistor
+R5	RC0603FR-070RL	0R 0603 Resistor
+R6	RC0603FR-07100KL	100k 0603 Resistor
+R7	RC0603FR-0710KL	10k 0603 Resistor
+C1	GRM32ER71J106KA12L	4u7 1206 Ceramic Cap
+C2	GRM32ER71J106KA12L	4u7 1206 Ceramic Cap
+C3	EEUFR1H221B	100u Electrolytic Cap
+C4	EEUFR1H221B	100u Electrolytic Cap
+C5	GRM32ER71J106KA12L	4u7 1206 Ceramic Cap
+C6	CL21A226MQQNNNG	1u 0805 Ceramic Cap
+C7	CL21A226MQQNNNG	1u 0805Ceramic Cap
+C8	CL21A224MQQNNNG	220n 0603 Ceramic Cap
+C9	CL21A471MQQNNNG	47p 0603 Ceramic Cap
+C10	N/A	Do Not Populate
+J1	TSW-102-07-L-S	Connector to Light Engine
+J2	PJ-002BH-SMT-TR	Input Connector (Barrel Jack)
+J3	TSW-102-07-L-S	Connector to Variable Resistor
+
+
+Design Walkthrough 
+Overview
+There are many approaches to DC to DC converter design. The traditional approach is to generate several equations for the various circuit components and solve them one by one with a pencil and paper. After this is done, iteration is required to refine the component values to make them practical. With the advent of modern scripting languages, this method has become rather tedious and inefficient. This converter was designed using a novel approach that makes use of scripting in MATLAB, numerical SPICE simulation using LTSPICE, practical knowledge and judgment as well as in lab prototyping, testing and circuit validation.
+The overarching design methodology is as follows:
+1.	Select an IC to control the converter
+2.	Read the IC’s datasheet, gather design equations
+3.	Convert design equations into script, brute force search over all possible component values to find the best fit
+4.	Simulate those chosen component parameters and refine as necessary
+5.	Built converter prototype in the lab and refine component values as necessary until acceptable result
+The generated scripts can be found on github here: https://github.com/ncardamone10/ELG4139 
+Prototype
+As a means of prototyping, the power converter section was built on protoboard to evaluate the thermal performance. The results are as follows.
+ 
+ 
+As seen from the thermal camera, the maximum temperature that the board reached was 56.6 °C, which is ultimately acceptable for this prototype, although a lower temperature is highly desirable. 
+PCB 
+Following the passed converter prototype, a 4 layer PCB was designed to further test this concept. Once the PCBs arrived, there were populated as required.
+ 
+ 
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+Discussion and Performance 
+
+Simulation vs Experimental Performance
+As mentioned previously, during the design stages, circuit simulation using LTSPICE was used as a method of validating component values. In the following simulation, the resistance of the variable resistor is changed as part of a transient analysis. The results from this showed that there isn’t a strict monotonic relationship between the variable resistor and the output current. In general, as the variable resistor decreases, the output current increases. This happens up to a breakpoint, where this relationship reverses until the variable resistor reaches zero which shuts the converter off entirely. This relationship is further validated in the experimental tests. However, given that the lower resistances are not of interest, this relationship reversal is not shown in the experimental plots.
+ 
+ 
+
+ 
+It is also worth pointing out that the switching frequency is not constant over the entire mode of operation. This is due to the variable resistor shorting out the frequency foldback block with in the oscillator feedback path of the LT8570. Since this design makes use of the LT8570 in a way it was not meant for, this change in switching frequency is undesirable as it causes a strange relationship between the variable resistor and output current.
+I 
+ 
+
+ 
+
+ 
+
+ 
+Theory of Operation Validation
+In order to validate the theory of operation of the converter as well as the component value selections, the PCBs needed to be assembled and tested in a lab. The following is the experimental setup, with three voltage channel measurements and one current measurement.
+ 
+The following shows two different switching frequencies as sell as the voltage across the series capacitor C1 as well as the voltage across the shunt inductor, L3 and the voltage at the switching node. Just as theory predicted, there is ringing on the switching node voltage caused by the converter being in discontinuous conduction mode which allows a resonance to be formed with the switching FET and the parasitics of the circuit. This resonance behavior implies a dependence on the switching frequency which explains the different number of peaks in the decay time on the voltage of the switching node. In addition to that, it can also be seen that the average voltage on the series capacitor is equal to the input voltage and the average voltage across the shunt inductor is zero.
+ 
+ 
+Efficiency
+The overall efficiency of this design is not great. As seen from the following figures, the maximum efficiency is about 72%. This does line up with the efficiency curves given in the datasheet for lighter load currents. What is rather peculiar is the efficiency vs switching frequency relationship is backwards to what is expected. Since switching losses generally increase as the switching frequency increases, the expected efficiency should decrease as the switching frequency increases, but this does not happen. This points to the switching losses not being the dominant loss mechanism in this converter design. Given that this converter has been pushed into discontinuous mode to eliminate the right hand side zero for to make the compensator behave better, this explanation does seem to explain the experimental results.
+ 
+
+ 
+ 
+ 
+Thermals
+As seen in the prototyping stage, a maximum temperature of 56.6 °C was observed during converter operation. To test this for the PCB, the converter was run at the maximum power dissipation point for around 30 minutes. The results were better that the prototype showing a maximum temperature of 30.5 °C on the LT8570 IC. The reason for this lower temperature rise comes from a number of factors such as greater thermal conductance of the PCB which allows for a greater heat spread, a switching FET with a lower RDS,On and a more optimised switching frequency. It is also worth noting that there is a horizontal offset in the color map of the images produced by the thermal camera.
+
+ 
+ 
+ 
+
+Conclusion
+To conclude, this work presented a SEPIC converter used to control a the LED current in a desk lamp. This design is based on component selection via scripting and simulation, prototyping via hardware experimentation, and validation via PCB design testing in the lab. The results show that this converter is a valid design and does do what it is supposed to do. However, there is some strange switching frequency deviation caused by the design of the chosen IC, the LT8570 SEPIC converter IC by Analog Devices and the overall efficiency leaves much to be desired. 
